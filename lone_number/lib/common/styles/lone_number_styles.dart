@@ -32,9 +32,19 @@ class LoneNumberStyles {
       GradientOutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           gradient: LinearGradient(
-            colors: [Color(0xFF8C67F4), Color(0xFFFFA4CF)],
+            colors: [
+              LoneNumberColors.gradientOneColor,
+              LoneNumberColors.gradientSecondColor
+            ],
           ),
           width: 2);
   TextStyle get loneNumberInputTextStyles =>
       TextStyle(color: LoneNumberColors.defaultGreyText, fontSize: 15);
+  TextStyle get loneNumberResultTextStyles => const TextStyle(
+        fontSize: 80.0,
+      );
+  TextStyle get loneNumberButtonText => const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      );
 }

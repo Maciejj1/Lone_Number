@@ -20,3 +20,12 @@ class OutlierSuccess extends OutlierState {
   @override
   List<Object?> get props => [result];
 }
+
+class OutlierError extends OutlierState {
+  final String error;
+
+  const OutlierError(this.error);
+
+  @override
+  List<Object?> get props => [error];
+}

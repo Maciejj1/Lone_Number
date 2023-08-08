@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lone_number/bloc/outlier_bloc.dart';
 import 'package:lone_number/common/helpers/lone_number_nav.dart';
+import 'package:lone_number/common/helpers/lone_number_snackbar.dart';
 import 'package:lone_number/common/styles/lone_number_styles.dart';
-import 'package:provider/provider.dart';
+import 'package:lone_number/pages/widgets/lone_number_button.dart';
+import 'package:lone_number/pages/widgets/lone_number_text_field.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../common/colors/lone_number_colors.dart';
 import '../../common/theme/bloc/theme_bloc.dart';
-import '../../common/theme/theme_constants.dart';
 import '../../config/models/number_list_model.dart';
-import '../../config/providers/outlier_provider.dart';
 import '../../services/outlier_service.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -28,8 +30,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         backgroundColor: LoneNumberColors.defaultBackgroundPage,
         body: SafeArea(
-            child: BlocProvider<DarkModeBloc>(
-          create: (context) => DarkModeBloc(),
+            child: MultiBlocProvider(
+          providers: [
+            BlocProvider<DarkModeBloc>(
+              create: (context) => DarkModeBloc(),
+            ),
+            BlocProvider<OutlierBloc>(
+              create: (context) => OutlierBloc(OutlierService()),
+            ),
+          ],
           child: resultBody(),
         )));
   }
@@ -40,7 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        navBloc(),
+        LoneNumberNav(navMethod: () {
+          setState(() {});
+          BlocProvider.of<DarkModeBloc>(context).add(ToggleDarkModeEvent());
+        }),
         Column(
           children: [
             Row(
@@ -54,127 +66,54 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            Gap(40),
-            textFieldBloc(),
+            const Gap(40),
+            LoneNumberTextField(
+              inputController: _inputController,
+            )
           ],
         ),
-        buttonBloc(),
-        Gap(10)
-      ],
-    );
-  }
-
-  Widget textFieldBloc() {
-    var loneNumberStyles = LoneNumberStyles(context);
-
-    return Column(
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width * 0.8,
-          height: 50,
-          child: TextFormField(
-            textAlignVertical: TextAlignVertical.bottom,
-            controller: _inputController,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              prefixIcon: Icon(Icons.numbers),
-              iconColor: Color(0xFF8C67F4),
-              prefixIconColor: Color(0xFF8C67F4),
-              hintText: "Wpisz ciąg znaków(po przecinku)",
-              hintStyle: loneNumberStyles.loneNumberInputTextStyles,
-              focusedBorder: loneNumberStyles.loneNumberInputBorderStyle,
-              enabledBorder: loneNumberStyles.loneNumberInputBorderStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buttonBloc() {
-    var loneNumberStyles = LoneNumberStyles(context);
-
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: ElevatedButton(
-        style: loneNumberStyles.loneNumberStyleButtonStyle,
-        onPressed: () {
-          final inputText = _inputController.text;
-          final numbers =
-              inputText.split(',').map((e) => int.parse(e.trim())).toList();
-
-          final outlier = OutlierService().findOutlier(NumberList(numbers));
-          Provider.of<OutlierProvider>(context, listen: false).outlier =
-              outlier;
-          GoRouter.of(context).go('/home/result');
-        },
-        child: Ink(
-          decoration: loneNumberStyles.loneNumberStyleButtonContainerStyle,
-          child: Container(
-            width: double.infinity,
-            height: 50,
-            alignment: Alignment.center,
-            child: const Text(
-              'Oblicz Wartość Odstającą',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget navBloc() {
-    return Container(
-      color: LoneNumberColors.defaultBackgroundPage,
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                SizedBox(
-                    width: 80, child: Image.asset('assets/images/logo.png')),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Lone Number',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: LoneNumberColors.defaultDarkText),
-                      ),
-                    ],
-                  ),
+        LoneNumberButton(
+          buttonMethod: () {
+            final inputText = _inputController.text;
+            final trimmedInput = inputText.replaceAll(RegExp(r'\s+'), '');
+            if (trimmedInput.isEmpty ||
+                !RegExp(r'^-?[\d,-]+$').hasMatch(trimmedInput)) {
+              showTopSnackBar(
+                Overlay.of(context),
+                const LoneNumberSnackbar.error(
+                  message: "Wprowadzono nieprawidłowy format danych",
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: switchToDark(),
-          )
-        ],
-      ),
-    );
-  }
+              );
+            } else {
+              final numbers = trimmedInput
+                  .split(',')
+                  .map((e) {
+                    final sanitizedValue =
+                        e.startsWith('-') ? e.substring(1) : e;
+                    return int.tryParse(sanitizedValue);
+                  })
+                  .where((e) => e != null)
+                  .cast<int>()
+                  .toList();
 
-  Widget switchToDark() {
-    return BlocBuilder<DarkModeBloc, DarkModeState>(
-      builder: (context, state) {
-        return Switch.adaptive(
-          value: DarkModeSwitch.isDarkMode,
-          onChanged: (value) {
-            setState(() {});
-            BlocProvider.of<DarkModeBloc>(context).add(ToggleDarkModeEvent());
+              if (numbers.length < 3) {
+                showTopSnackBar(
+                  Overlay.of(context),
+                  const LoneNumberSnackbar.error(
+                    message: "Wpisałeś za krótki ciąg liczb",
+                  ),
+                );
+              } else {
+                final outlierBloc = context.read<OutlierBloc>();
+                outlierBloc.add(SearchEvent(NumberList(numbers)));
+                GoRouter.of(context).go('/home/result');
+              }
+            }
           },
-        );
-      },
+          buttonText: 'Oblicz Wartość Odstającą',
+        ),
+        const Gap(10)
+      ],
     );
   }
 }

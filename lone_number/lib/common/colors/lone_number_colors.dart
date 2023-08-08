@@ -24,6 +24,9 @@ class LoneNumberColors {
   static Color get defaultExpensesText => DarkModeSwitch.isDarkMode
       ? const Color(0xFF407AFF)
       : const Color(0xFF407AFF);
-  static Color get defaultGreyText =>
-      DarkModeSwitch.isDarkMode ? Color(0xFFFFFFFF) : Color(0xFF87898E);
+  static Color get defaultGreyText => DarkModeSwitch.isDarkMode
+      ? const Color(0xFFFFFFFF)
+      : const Color(0xFF87898E);
+  static Color get gradientOneColor => const Color(0xFF8C67F4);
+  static Color get gradientSecondColor => const Color(0xFFFFA4CF);
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lone_number/common/styles/lone_number_styles.dart';
+import 'package:lone_number/pages/widgets/lone_number_button.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class SplashScreen extends StatelessWidget {
                 height: 550,
                 child: Center(
                   child: Image.asset(
-                    'assets/images/splash_screen_image.png', // Popraw ścieżkę do pliku SVG
+                    'assets/images/splash_screen_image.png',
                   ),
                 ),
               ),
@@ -28,7 +29,6 @@ class SplashScreen extends StatelessWidget {
               Text(
                 'Witaj w Lone Number',
                 style: loneNumberStyles.loneNumberTitleStyle,
-// Upewnij się, że ta zmienna jest zdefiniowana
               ),
               const Gap(30),
               const SizedBox(
@@ -44,29 +44,9 @@ class SplashScreen extends StatelessWidget {
                 ),
               ),
               const Gap(30),
-              SizedBox(
-                width: MediaQuery.of(context).size.width - 60,
-                child: ElevatedButton(
-                  style: loneNumberStyles.loneNumberStyleButtonStyle,
-                  onPressed: () => context.go('/home'),
-                  child: Ink(
-                    decoration:
-                        loneNumberStyles.loneNumberStyleButtonContainerStyle,
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Zacznijmy',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              LoneNumberButton(
+                  buttonMethod: () => context.go('/home'),
+                  buttonText: 'Zacznijmy'),
               const Gap(30),
             ],
           ),

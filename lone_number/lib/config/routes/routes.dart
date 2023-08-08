@@ -19,13 +19,13 @@ class Routes {
             GoRoute(
               path: '/home',
               builder: (BuildContext context, GoRouterState state) {
-                return HomeScreen();
+                return const HomeScreen();
               },
               routes: <RouteBase>[
                 GoRoute(
                   path: 'result',
                   builder: (BuildContext context, GoRouterState state) {
-                    return ResultScreen();
+                    return const ResultScreen();
                   },
                 ),
               ],

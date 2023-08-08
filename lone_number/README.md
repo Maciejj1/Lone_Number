@@ -39,6 +39,7 @@
 
 * Calculating the outlier of an array of integers
 * Visual demonstration of outliers
+* Unit tests
 * Dark/Light mode
 * Cross platform
   - iOS, Android.

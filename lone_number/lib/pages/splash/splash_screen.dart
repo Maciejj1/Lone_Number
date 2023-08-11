@@ -15,10 +15,10 @@ class SplashScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const Gap(30),
+              const Gap(0),
               SizedBox(
                 width: MediaQuery.of(context).size.width,
-                height: 550,
+                height: 450,
                 child: Center(
                   child: Image.asset(
                     'assets/images/splash_screen_image.png',

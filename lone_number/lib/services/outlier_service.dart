@@ -2,13 +2,32 @@ import '../config/models/number_list_model.dart';
 
 class OutlierService {
   int findOutlier(NumberList numberList) {
-    final oddNumbers = numberList.numbers.where((number) => number % 2 != 0);
-    final evenNumbers = numberList.numbers.where((number) => number % 2 == 0);
+    final numbers = numberList.numbers;
+    final median = _calculateMedian(numbers);
 
-    if (oddNumbers.length == 1) {
-      return oddNumbers.first;
+    num maxDeviation = 0;
+    var outlierValue = numbers[0]; // Initialize with the first number
+
+    for (var number in numbers) {
+      final deviation = (number - median).abs();
+      if (deviation > maxDeviation) {
+        maxDeviation = deviation;
+        outlierValue = number;
+      }
+    }
+
+    return outlierValue;
+  }
+
+  num _calculateMedian(List<int> numbers) {
+    final sortedNumbers = [...numbers]..sort();
+    final n = sortedNumbers.length;
+
+    if (n % 2 == 1) {
+      return sortedNumbers[n ~/ 2].toInt();
     } else {
-      return evenNumbers.first;
+      final mid = n ~/ 2;
+      return (sortedNumbers[mid - 1] + sortedNumbers[mid]) / 2.0;
     }
   }
 }

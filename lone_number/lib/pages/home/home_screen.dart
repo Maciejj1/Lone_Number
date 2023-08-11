@@ -87,13 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             } else {
               final numbers = trimmedInput
                   .split(',')
-                  .map((e) {
-                    final sanitizedValue =
-                        e.startsWith('-') ? e.substring(1) : e;
-                    return int.tryParse(sanitizedValue);
-                  })
-                  .where((e) => e != null)
-                  .cast<int>()
+                  .map((e) => int.tryParse(e) ?? 0)
                   .toList();
 
               if (numbers.length < 3) {
@@ -104,6 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               } else {
+                // final sum = numbers.reduce((value, element) => value + element);
+                // final minMaxSum = sum -
+                //     numbers.reduce((min, value) => value < min ? value : min) -
+                //     numbers.reduce((max, value) => value > max ? value : max);
+                // final outlierValue = sum - minMaxSum;
+
                 final outlierBloc = context.read<OutlierBloc>();
                 outlierBloc.add(SearchEvent(NumberList(numbers)));
                 GoRouter.of(context).go('/home/result');

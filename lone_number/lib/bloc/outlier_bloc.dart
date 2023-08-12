@@ -12,7 +12,7 @@ class OutlierBloc extends Bloc<OutlierEvent, OutlierState> {
 
   OutlierBloc(this.outlierService) : super(OutlierInitial()) {
     on<SearchEvent>((event, emit) {
-      final result = outlierService.findOutlier(event.numberList);
+      final result = outlierService.findOutlierValue(event.numberList);
       emit(OutlierSuccess(result));
     });
   }

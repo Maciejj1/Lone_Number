@@ -1,27 +1,26 @@
 import '../config/models/number_list_model.dart';
 
 class OutlierService {
-  int findOutlier(NumberList numberList) {
+  int findOutlierValue(NumberList numberList) {
     final numbers = numberList.numbers;
-    int evenCount = 0;
-    int oddCount = 0;
-    int outlierValue = numbers[0]; // Initialize with the first number
+    List<int> values = List.from(numbers);
 
-    for (var number in numbers) {
-      if (number % 2 == 0) {
-        evenCount++;
-        outlierValue = number;
+    // Find the outlier value
+    int outlierValue = 0; // Initialize with a default value
+    if (values[0] % 2 == values[1] % 2) {
+      // If the first two numbers have the same parity, the outlier is the one with a different parity
+      for (int i = 2; i < values.length; i++) {
+        if (values[i] % 2 != values[0] % 2) {
+          outlierValue = values[i];
+          break;
+        }
+      }
+    } else {
+      // If the first two numbers have different parity, the outlier is one of them
+      if (values[0] % 2 != values[2] % 2) {
+        outlierValue = values[0];
       } else {
-        oddCount++;
-        outlierValue = number;
-      }
-
-      if (evenCount > 1 && oddCount == 1) {
-        break; // Found the outlier
-      }
-
-      if (oddCount > 1 && evenCount == 1) {
-        break; // Found the outlier
+        outlierValue = values[1];
       }
     }
 
